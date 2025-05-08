@@ -1,12 +1,14 @@
 use rmcp::schemars;
 use serde::{Deserialize, Serialize};
-
+use validator::Validate;
 use crate::domain::entities::todo_entity::{ NewTodoEntity, UpdateTodoEntity};
 
 
-#[derive(Deserialize,Serialize, Debug, Clone, schemars::JsonSchema)]
+#[derive(Deserialize,Serialize, Debug, Clone, schemars::JsonSchema, Validate)]
 pub struct ReqCreateTodoDto{
+    #[validate(length(min = 1, message = "title cannot be empty"))]
     pub title: String,
+    #[validate(length(min = 1, message = "description cannot be empty"))]
     pub description: String,
     pub is_done: bool
 }
