@@ -1,0 +1,13 @@
+@startuml 
+
+entity "todolist" as todolist {
+  * id : INT <<PK>>
+  --
+  * title : VARCHAR(100)
+  * description : TEXT
+  * is_done : BOOLEAN
+  * created_at : DATETIME
+  * updated_at : DATETIME
+}
+
+@enduml
