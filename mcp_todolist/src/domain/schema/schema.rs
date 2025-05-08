@@ -2,7 +2,7 @@
 
 diesel::table! {
     todolist (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         title -> Text,
         description -> Text,
         is_done -> Bool,

@@ -27,7 +27,7 @@ pub struct UpdateTodoEntity {
 #[diesel(table_name=todolist)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct EntryTodoEntity {
-    pub id: Option<i32>,
+    pub id: i32,
     pub title: String,
     pub description: String,
     pub is_done: bool,
@@ -39,10 +39,8 @@ pub struct EntryTodoEntity {
 impl From<EntryTodoEntity> for ResEntryTodoDto {
     fn from(the_entity: EntryTodoEntity) -> Self {
         
-        let extract_id = the_entity.id.unwrap_or_else(||0);
-        let id_u32 = extract_id as u32;
         ResEntryTodoDto { 
-            id: id_u32, 
+            id: the_entity.id as u32, 
             title: the_entity.title, 
             description: the_entity.description, 
             is_done: the_entity.is_done, 
