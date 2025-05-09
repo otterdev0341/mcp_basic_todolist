@@ -20,7 +20,7 @@ impl TodoListSqliteRepository {
 #[async_trait::async_trait]
 impl TodoOperationRepository for TodoListSqliteRepository {
     
-    async fn create_task(&self, dto: ReqCreateTodoDto) -> Result<i32> {
+    async fn create_task(&self, dto: ReqCreateTodoDto) -> Result<ResEntryTodoDto> {
         let conn = &mut self
             .db_pool
             .get()
@@ -28,16 +28,16 @@ impl TodoOperationRepository for TodoListSqliteRepository {
 
         let entity: NewTodoEntity = dto.into();
 
-        let result_id = insert_into(todolist::table)
+        let inserted: EntryTodoEntity = insert_into(todolist::table)
             .values(entity)
-            .returning(todolist::id)
+            .returning(todolist::all_columns)
             .get_result(conn)
             .context("Failed to insert new todo into database")?;
 
-        Ok(result_id)
+        Ok(inserted.into())
     }
 
-    async fn update_task(&self, task_id: i32, dto: ReqUpdateTodoDto) -> Result<()> {
+    async fn update_task(&self, task_id: i32, dto: ReqUpdateTodoDto) -> Result<ResEntryTodoDto> {
         
         use crate::domain::schema::schema::todolist::dsl::*;
 
@@ -57,7 +57,12 @@ impl TodoOperationRepository for TodoListSqliteRepository {
             anyhow::bail!("No todo item found with id {}", task_id);
         }
 
-        Ok(())
+        let result: EntryTodoEntity = todolist
+            .filter(id.eq(task_id))
+            .first(conn)
+            .context(format!("Failed to get Data"))?;
+
+        Ok(result.into())
     }
     async fn get_by_id(&self, task_id: i32) -> Result<ResEntryTodoDto> {
         

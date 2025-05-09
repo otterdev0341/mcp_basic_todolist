@@ -21,17 +21,17 @@ impl TodolistUseCase {
         }
     }
 
-    pub async fn create_task(&self, dto: ReqCreateTodoDto) -> Result<i32> {
+    pub async fn create_task(&self, dto: ReqCreateTodoDto) -> Result<ResEntryTodoDto> {
         let result = self.todo_repo.create_task(dto).await;
         match result {
             Ok(data) => Ok(data),
             Err(_) => Err(anyhow!("Fail to create")),
         }
     }
-    pub async fn update_task(&self, task_id: i32, dto: ReqUpdateTodoDto) -> Result<()> {
+    pub async fn update_task(&self, task_id: i32, dto: ReqUpdateTodoDto) -> Result<ResEntryTodoDto> {
         let result = self.todo_repo.update_task(task_id, dto).await;
         match result {
-            Ok(_) => Ok(()),
+            Ok(data) => Ok(data),
             Err(_) => Err(anyhow!("Fail to update")),
         }
     }

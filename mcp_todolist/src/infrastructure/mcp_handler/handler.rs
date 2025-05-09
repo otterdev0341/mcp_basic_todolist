@@ -27,26 +27,42 @@ impl MCPHandler {
 
 
     #[tool(description = r#"
-        ใช้คำสั่งนี้เพื่อสร้างงานใหม่ในระบบ / Use this to create a new task.
-
-        📥 JSON Payload ตัวอย่าง / Example:
-        {
-        "title": "Buy groceries",
-        "description": "Milk, eggs, and bread",
-        "is_done": false
-        }
-
-        Fields:
-        - title (string): ชื่อของงาน / Title of the task
-        - description (string): รายละเอียดของงาน / Task description
-        - is_done (boolean): งานเสร็จหรือยัง / Whether the task is completed
+    🆕 ใช้คำสั่งนี้เพื่อสร้างงานใหม่ในระบบ โดยระบุชื่อ รายละเอียด และสถานะของงาน  
+    🆕 Use this command to create a new task by specifying its title, description, and status.
+    
+    📥 ตัวอย่าง JSON ที่ใช้ส่งข้อมูล / Example Request:
+    {
+      "title": "Buy groceries",
+      "description": "Milk, eggs, and bread",
+      "is_done": false
+    }
+    
+    🧾 รายละเอียดฟิลด์ / Field Descriptions:
+    - title (string): ชื่อของงาน (จำเป็น ต้องไม่ว่าง)  
+      Title of the task (required, must not be empty)
+    - description (string): รายละเอียดของงาน (จำเป็น ต้องไม่ว่าง)  
+      Description of the task (required, must not be empty)
+    - is_done (boolean): สถานะของงานว่าเสร็จแล้วหรือไม่  
+      Whether the task is completed
+    
+    📤 ผลลัพธ์ / Response:
+    - ✅ หากสำเร็จ: ระบบจะส่งข้อมูลของงานที่ถูกสร้างกลับมา  
+      On success, returns the full data of the newly created task
+    - ❌ หากข้อมูลไม่ถูกต้อง: ระบบจะส่งข้อความแจ้งข้อผิดพลาดกลับ  
+      If validation fails, an error message will be returned
     "#)]
     pub async fn create_task(
         &self,
         #[tool(aggr)] dto: ReqCreateTodoDto
     ) -> Result<CallToolResult, McpError> {
         match self.todo_use_case.create_task(dto).await {
-            Ok(data) => Ok(CallToolResult::success(vec![Content::text(format!("Task create succesfull id: {}", data))])),
+            Ok(data) => {
+                if let Ok(convert) = Content::json(data) {
+                    Ok(CallToolResult::success(vec![convert]))
+                } else {
+                    Err(McpError::internal_error("Failed to convert results to JSON".to_string(), None))
+                }
+            },
             Err(e) => Err(McpError::internal_error(e.to_string(), None))
         }
     }
@@ -173,10 +189,10 @@ impl MCPHandler {
 
 
     #[tool(description = r#"
-        ใช้คำสั่งนี้เพื่ออัปเดตข้อมูลของงานที่มีอยู่ โดยระบุรหัสของงานและข้อมูลที่ต้องการเปลี่ยน /  
-        Use this command to update an existing task by specifying its ID and the fields to be updated.
+        🔧 ใช้คำสั่งนี้เพื่ออัปเดตงานที่มีอยู่ โดยระบุรหัสของงาน (id) และข้อมูลที่ต้องการแก้ไข  
+        🔧 Use this command to update an existing task by specifying its ID and the updated fields.
 
-        📥 JSON Payload ตัวอย่าง / Example Request:
+        📥 ตัวอย่าง JSON ที่ใช้ส่งข้อมูล / Example Request:
         {
         "id": 1,
         "title": "Buy groceries and fruits",
@@ -185,15 +201,19 @@ impl MCPHandler {
         }
 
         🧾 รายละเอียดฟิลด์ / Field Descriptions:
-        - id (integer): รหัสของงานที่ต้องการอัปเดต / The ID of the task to update (required)
-        - title (string, optional): ชื่อใหม่ของงาน / New title for the task
-        - description (string, optional): รายละเอียดใหม่ของงาน / New description for the task
-        - is_done (boolean, optional): สถานะความสำเร็จของงาน / Updated completion status
+        - id (integer): รหัสของงานที่ต้องการอัปเดต (จำเป็น)  
+        The ID of the task to update (required). If unknown, call `get_all()` first.
+        - title (string, optional): ชื่อใหม่ของงาน  
+        New title for the task
+        - description (string, optional): รายละเอียดใหม่ของงาน  
+        New description for the task
+        - is_done (boolean, optional): สถานะความสำเร็จของงาน  
+        Updated completion status
 
         📤 ผลลัพธ์ / Response:
-        - หากสำเร็จ ระบบจะส่งข้อความ `"Task update successful!!!"` กลับ / 
-        On success, returns the message `"Task update successful!!!"`
-        - หากไม่พบงาน ระบบจะส่งข้อผิดพลาดกลับ / 
+        - ✅ หากสำเร็จ: `"Task update successful!!!"`  
+        On success, returns `"Task update successful!!!"`
+        - ❌ หากไม่พบงาน: ระบบจะส่งข้อความข้อผิดพลาดกลับ  
         If the task is not found, an error will be returned
     "#)]
     pub async fn update_task(
@@ -202,7 +222,13 @@ impl MCPHandler {
     ) -> Result<CallToolResult, McpError>
     {
         match self.todo_use_case.update_task(dto.id as i32, dto).await {
-            Ok(_) => Ok(CallToolResult::success(vec![Content::text(format!("Task update succesfull!!!"))])),
+            Ok(data) => {
+                if let Ok(convert) = Content::json(data) {
+                    Ok(CallToolResult::success(vec![convert]))
+                } else {
+                    Err(McpError::internal_error("Failed to convert results to JSON".to_string(), None))
+                }
+            },
             Err(e) => Err(McpError::internal_error(e.to_string(), None))
         }
     }

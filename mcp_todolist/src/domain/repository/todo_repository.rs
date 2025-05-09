@@ -5,8 +5,8 @@ use crate::domain::dto::todo_dto::{ReqCreateTodoDto, ReqUpdateTodoDto, ResEntryT
 #[async_trait::async_trait]
 #[mockall::automock]
 pub trait TodoOperationRepository {
-    async fn create_task(&self, dto: ReqCreateTodoDto) -> Result<i32>;
-    async fn update_task(&self, task_id: i32, dto: ReqUpdateTodoDto) -> Result<()>;
+    async fn create_task(&self, dto: ReqCreateTodoDto) -> Result<ResEntryTodoDto>;
+    async fn update_task(&self, task_id: i32, dto: ReqUpdateTodoDto) -> Result<ResEntryTodoDto>;
     async fn get_by_id(&self, task_id: i32) -> Result<ResEntryTodoDto>;
     async fn get_all(&self) -> Result<Vec<ResEntryTodoDto>>;
     async fn delete_task(&self, task_id: i32) -> Result<()>;
