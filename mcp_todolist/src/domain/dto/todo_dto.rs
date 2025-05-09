@@ -26,6 +26,7 @@ impl From<ReqCreateTodoDto> for NewTodoEntity {
 
 #[derive(Deserialize,Serialize, Debug, Clone, schemars::JsonSchema)]
 pub struct ReqUpdateTodoDto{
+    pub id: i32,
     pub title: Option<String>,
     pub description: Option<String>,
     pub is_done: Option<bool>
@@ -51,3 +52,8 @@ pub struct ResEntryTodoDto{
     pub updated_at: String
 }
 
+
+#[derive(Deserialize,Serialize, Debug, Clone, schemars::JsonSchema)]
+pub struct GetTaskById {
+    pub id: u32
+}
