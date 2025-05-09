@@ -30,3 +30,8 @@ diesel = { version = "2.2.0", features = [
     "returning_clauses_for_sqlite_3_35",
     "r2d2",
 ] }
+
+
+[[example]]
+name = "mcp_todolist"
+path = "src/main.rs"
