@@ -1,6 +1,5 @@
 use utoipa::OpenApi;
 
-use crate::domain::dto::todo_dto::{ReqCreateTodoDto, ResEntryTodoDto};
 
 
 #[derive(OpenApi)]

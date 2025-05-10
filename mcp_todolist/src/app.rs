@@ -1,20 +1,7 @@
 use std::sync::Arc;
-
-use rocket::{get, http::Status, launch, routes, State};
 use tracing_subscriber::EnvFilter;
-use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
-
 use crate::{api_docs::init_open_api::init_openapi, application::usecase::todo_usecase::TodolistUseCase, configuration::{api_doc_config::ApiDoc, config}, infrastructure::{http_handler::{http_handler::todolist_routes, init_handler::init_controller_setup}, sqlite::{db_connection::sqlite_con::conn, repository_impl::todolist::TodoListSqliteRepository}}};
-
-
-#[get("/todos/undone_count")]
-async fn count_undone(state: &State<Arc<TodolistUseCase>>) -> Result<String, Status> {
-    match state.count_undone_task().await {
-        Ok(count) => Ok(format!("You have {} tasks, mark as undone", count)),
-        Err(_) => Err(Status::InternalServerError),
-    }
-}
 
 
 
