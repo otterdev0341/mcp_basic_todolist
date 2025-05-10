@@ -30,6 +30,9 @@ diesel = { version = "2.2.0", features = [
     "returning_clauses_for_sqlite_3_35",
     "r2d2",
 ] }
+rocket = { version = "0.5.1", features = ["json"]}
+utoipa = "5.3.1"
+utoipa-swagger-ui = {version="*", features=["rocket"]}
 
 
 [[example]]
