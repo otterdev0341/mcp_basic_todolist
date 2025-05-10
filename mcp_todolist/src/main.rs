@@ -1,9 +1,14 @@
 use std::sync::Arc;
 
 use anyhow::Result;
-use mcp_todolist::{application::usecase::todo_usecase::TodolistUseCase, configuration::config, infrastructure::{mcp_handler::handler::MCPHandler, sqlite::{db_connection::sqlite_con::conn, repository_impl::todolist::TodoListSqliteRepository}}};
+use mcp_todolist::{app::rocket, application::usecase::todo_usecase::TodolistUseCase, configuration::config, infrastructure::{mcp_handler::handler::MCPHandler, sqlite::{db_connection::sqlite_con::conn, repository_impl::todolist::TodoListSqliteRepository}}};
 use rmcp::{ transport::stdio, ServiceExt};
+use rocket::launch;
 use tracing_subscriber::EnvFilter;
+
+
+
+
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -35,8 +40,12 @@ async fn main() -> Result<()> {
         tracing::error!("serving error: {:?}", e);
     })?;
 
+    let _ = rocket().unwrap();
+
     service.waiting().await?;
     
 
     Ok(())
 }
+
+
